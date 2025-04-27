@@ -15,7 +15,6 @@ type Props = {
 
 export default function Modal({ open, onClose, onSave, defaultItem }: Props) {
   const [form, setForm] = useState({ name: "", category: "", price: 0 });
-
   useEffect(() => {
     if (defaultItem) {
       setForm(defaultItem);
