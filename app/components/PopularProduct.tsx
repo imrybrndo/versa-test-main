@@ -35,12 +35,9 @@ const PopularProduct = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-16">
       <div className="text-center mb-10">
-        <h2 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-teal-400 mb-2">
-          Discover Trending Posts
+        <h2 className="text-5xl font-semibold mb-2">
+          Popular Product By Categories
         </h2>
-        <p className="text-gray-600">
-          Temukan artikel-artikel menarik yang telah banyak dibaca oleh pengguna
-        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
