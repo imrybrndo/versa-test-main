@@ -1,70 +1,93 @@
+"use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import React from "react";
 
-const products = [
-  {
-    id: 1,
-    name: "Custom Mug",
-    image:
-      "https://images.unsplash.com/photo-1591080824818-e4401eabc21b?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    price: "Rp35.000",
-  },
-  {
-    id: 2,
-    name: "Digital Artwork",
-    image:
-      "https://images.unsplash.com/photo-1658246944413-8265fc09c87c?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    price: "Rp150.000",
-  },
-  {
-    id: 3,
-    name: "Stiker Kustom",
-    image:
-      "https://images.unsplash.com/photo-1591176335253-d7dfa2a1e45f?q=80&w=2067&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    price: "Rp10.000",
-  },
-  {
-    id: 4,
-    name: "Print Foto",
-    image:
-      "https://images.unsplash.com/photo-1559980641-56f8365ccb84?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    price: "Rp20.000",
-  },
-];
+type Post = {
+  id: number;
+  title: string;
+  content: string;
+  imageUrl: string;
+  createdAt: string;
+};
 
-function PopularProduct() {
+const PopularProduct = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [hoveredPost, setHoveredPost] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(
+          "https://versa-test-admin-596u.vercel.app/api/post"
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+    fetchPosts();
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-16">
       <div className="text-center mb-10">
-        <h2 className="text-5xl font-bold mb-2">
-          Product Product by Categories
+        <h2 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-teal-400 mb-2">
+          Discover Trending Posts
         </h2>
         <p className="text-gray-600">
-          Temukan produk paling sering digunakan oleh pengguna kami
+          Temukan artikel-artikel menarik yang telah banyak dibaca oleh pengguna
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
+        {posts.map((post) => (
           <div
-            key={product.id}
-            className="card bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition"
+            key={post.id}
+            className="relative group overflow-hidden rounded-xl bg-white shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out"
+            onMouseEnter={() => setHoveredPost(post.id)}
+            onMouseLeave={() => setHoveredPost(null)}
           >
-            <figure>
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-48 object-cover"
+            <figure className="relative w-full h-56 overflow-hidden">
+              <Image
+                src={post.imageUrl}
+                alt={post.title}
+                layout="fill"
+                objectFit="cover"
+                className="group-hover:scale-110 transition-transform duration-300 ease-in-out"
               />
             </figure>
-            <div className="card-body p-4">
-              <h3 className="text-lg font-semibold text-gray-800">
-                {product.name}
+            <div
+              className={`absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-transparent to-transparent ${
+                hoveredPost === post.id ? "opacity-60" : "opacity-0"
+              } transition-opacity duration-300 ease-in-out`}
+            />
+            <div
+              className="card-body p-6 relative z-10"
+              style={{
+                transition: "transform 0.3s ease, opacity 0.3s ease",
+                transform:
+                  hoveredPost === post.id
+                    ? "translateY(-20px)"
+                    : "translateY(0)",
+                opacity: hoveredPost === post.id ? 1 : 0.8,
+              }}
+            >
+              <h3 className="text-xl font-semibold text-gray-800">
+                {post.title}
               </h3>
-              <p className="text-sm text-teal-600 font-bold">{product.price}</p>
-              <div className="card-actions mt-4">
-                <button className="btn btn-sm bg-teal-500 text-white rounded-full hover:bg-teal-600">
-                  Lihat Produk
+              <p className="text-gray-600 text-sm line-clamp-3">
+                {post.content}
+              </p>
+              <div className="mt-4 flex items-center justify-between">
+                <p className="text-xs text-gray-500">
+                  Published: {new Date(post.createdAt).toLocaleDateString()}
+                </p>
+                <button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full py-2 px-4 transition-all duration-200">
+                  Read More
                 </button>
               </div>
             </div>
@@ -73,6 +96,6 @@ function PopularProduct() {
       </div>
     </div>
   );
-}
+};
 
 export default PopularProduct;
